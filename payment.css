@@ -1,0 +1,557 @@
+    /* ================= Header & LiveStats ================= */
+/* Body relative for absolute positioning */
+body {
+    margin: 0;
+    
+    font-family: sans-serif;
+    background: #121212;
+    color: #fff;
+    text-align: center;
+    position: relative;
+} 
+    
+    
+    canvas { 
+    margin-top: 20px; /* header ও wallet-bar থেকে নিচে space */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+    
+    
+      
+    
+   
+  
+  /* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    background: #121212;
+    color: #fff;
+    position: relative; /* #liveStats absolute reference */
+}
+
+/* LiveStats centered inside header */
+#liveStats {
+    position: absolute;
+    top: 25%;                 /* vertical center */
+    left: 50%;                /* horizontal center */
+    transform: translate(-50%, -50%);
+    font-family: 'Roboto Slab', serif;
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #00eaff;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;                 /* Online text + green dot spacing */
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+    pointer-events: none;     /* click/block avoid on background buttons */
+    white-space: nowrap;      /* wrapping এড়াবে */
+}
+
+/* Green dot */
+#liveStats .online-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Optional: যদি liveStats clickable বা interactive করতে চাও */
+.header-text {
+    pointer-events: auto;  /* click, hover কাজ করবে */
+    user-select: none;     /* text select block */
+    cursor: default;       /* mouse pointer */
+}
+  
+
+/* Mobile menus */
+.mobile-menu { position: relative; display: inline-block; }
+.menu-btn {
+    background: transparent;
+    color: #00eaff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 24px;
+}
+.menu-btn:hover { background: linear-gradient(135deg, #05080b, #0a0f14); }
+
+.menu-content {
+    display: none;
+    position: absolute;
+    top: 35px;
+    background: #1e1e1e;
+    min-width: 120px;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    z-index: 10;
+    flex-direction: column;
+}
+.menu-content button {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    background: #2e2e2e;
+    color: #fff;
+    cursor: pointer;
+    text-align: left;
+}
+.menu-content button:hover { background: #444; }
+.mobile-menu.active .menu-content { display: flex; }
+
+/* Buttons */
+button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+
+/* Canvas */
+canvas { margin-top: 5px; }
+
+/* Spin Button */
+#spinBtn {
+    margin-top: 5px;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    background: #28a745;
+    color: #fff;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+}
+#spinBtn:disabled {
+    cursor: not-allowed;
+    background-color: #013220;
+    color: #808080;
+    text-shadow: none;
+    pointer-events: none;
+}
+
+/* Result / LiveStats spacing */
+#result, #liveStats { margin-top: 15px; font-size: 18px; }
+   
+    
+    
+    /* Notification Base */
+#notification {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 260px;
+    max-width: 90%;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    display: none;
+    z-index: 999999999;
+    isolation: isolate;
+    pointer-events: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Success Notification */
+#notification.success {
+    background: linear-gradient(90deg, #28a745, #28a745); /* ডান-বাম একই সবুজ */
+    border: 2px solid #1e7e34;
+    color: #fff;
+}
+
+/* Error / Warning Notification */
+#notification.error {
+    background: linear-gradient(90deg, #ff4d4d, #ff4d4d); /* ডান-বাম একই লাল */
+    border: 2px solid #b30000;
+    color: #fff;
+}
+  
+    
+/* Footer */
+.footer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: #1b1b1b;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+    z-index: 1000;
+}
+.footer-bar button {
+    flex: 1;
+    min-width: 0;
+    height: 48px;
+    background: linear-gradient(135deg, #0f141a, #0a0f14);
+    color: #00eaff;
+    border: none;
+    border-radius: 6px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+}
+.footer-bar button:hover { background: linear-gradient(135deg, #0a0f14, #1b2735); }
+.footer-bar button:active { transform: scale(0.95); }
+  
+  
+    
+    
+    
+
+
+
+/* ⤵️⤵️⤵️⤵️⤵️ Wallet Bar*/
+/* 🛑🛑🛑🛑🛑 Wallet Bar*/
+/* 🛑🛑🛑🛑🛑 Wallet Bar*/
+/* 🛑🛑🛑🛑🛑 Wallet Bar*/
+ 
+.wallet-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0px;
+    background: #0f141a;
+    color: #00eaff;
+    font-size: 14px;
+    height: 20px;
+    border-bottom: none;
+    position: relative;
+}
+
+.wallet-bar::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 22px;
+    right: 22px;
+    height: 0.1px;
+    background: #444;
+}
+
+/* 🛑 ওয়ালেট বার */
+.wallet-left { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    position: relative; 
+    overflow: visible; 
+}
+
+.wallet-left strong { margin-left: 15px; }
+
+#addFunds {
+    padding: 4px 4px;
+    margin-left:20px;
+    font-size: 14px;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #0f141a, #0a0f14);
+    color: #00eaff;
+    cursor: pointer;
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.05);
+}
+
+/* Hover effect for Add Funds */
+#addFunds:hover { 
+    background: linear-gradient(135deg, #0a0f14, #1b2735); 
+}
+
+/* Add Funds Highlight */
+.add-funds-highlight {
+    background-color: #28a745 !important;
+    color: #fff !important;
+    border: 2px solid #1e7e34 !important;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.7);
+    transition: all 0.3s ease;
+}
+
+/* Demo balance dropdown */
+.demo-balance-dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
+    max-width: 150px;
+}
+
+.demo-balance-dropdown strong {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 120px;
+    max-width: 200px;
+    height: 32px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #00eaff; /* Updated font color */
+    background: linear-gradient(135deg, #0f141a, #0a0f14); /* Added background */
+    border-radius: 4px; /* ✅ Same radius as other wallet buttons */
+}
+
+.demo-balance-dropdown strong::-webkit-scrollbar { display: none; }
+
+.demo-balance-dropdown strong > #balanceAmount,
+.demo-balance-dropdown strong .arrow { 
+    flex-shrink: 0; 
+    white-space: nowrap; 
+    margin-left: 2px; 
+}
+
+.demo-balance-dropdown strong .arrow { 
+    font-size: 20px; 
+    margin-top: -10px; 
+    margin-left: 4px; 
+}
+
+.demo-balance-content {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    min-width: 160px;
+    background: #1e1e1e;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    z-index: 9999;
+    flex-direction: column;
+}
+
+.demo-balance-content button {
+    width: 100%;
+    padding: 5px 2px;
+    border: none;
+    background: linear-gradient(135deg, #0f141a, #0a0f14); /* ✅ Same background */
+    color: #00eaff; /* ✅ Same font color */
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 4px; /* ✅ Same radius */
+}
+
+.demo-balance-content button:hover { 
+    background: linear-gradient(135deg, #0a0f14, #1b2735); 
+}
+
+.demo-balance-dropdown.active .demo-balance-content { display: flex; }
+
+
+
+
+
+/* ================= Wallet Containers ================= */
+.wallet-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-right:20px;
+    gap:5px;
+}
+
+/* ================= Wallet Buttons ================= */
+.wallet-right button {
+    padding: 4px 4px;
+    font-size: 14px;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 4px; /* ✅ Same radius as Add Funds */
+    background: linear-gradient(135deg, #0f141a, #0a0f14); /* ✅ Same background */
+    color: #00eaff; /* ✅ Same font color */
+    cursor: pointer;
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.05);
+}
+
+.wallet-right button:hover {
+    background: linear-gradient(135deg, #0a0f14, #1b2735);
+}
+
+/* ================= Deposit & Withdraw Wrapper ================= */
+.deposit-wrapper,
+.withdraw-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 0px;
+}
+
+
+
+/* ================= Panels ================= */
+/* ================= Full Screen Panel ================= */
+.panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;      /* পুরো স্ক্রিন জুড়ে */
+    height: 100vh;     /* পুরো স্ক্রিন জুড়ে */
+    padding: 20px 5px 60px 5px; /* উপরের ও নিচের গ্যাপ */
+    background: #111;
+    border-radius: 0;  /* পুরো স্ক্রিনে rounded দরকার নেই */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    z-index: 9999;
+    gap: 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;      /* লাইন বাই লাইন সেন্টার */
+    justify-content: flex-start; /* উপরের দিকে থেকে শুরু */
+    box-sizing: border-box;
+}
+
+.hidden { display: none; }
+
+
+/* ================= Cancel Buttons ================= */
+#cancelDeposit,
+#cancelWithdraw {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: inherit;
+    color: red; 
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
+    text-align: center;
+}
+
+#cancelDeposit:hover,
+#cancelWithdraw:hover {
+    color: darkred;
+    box-shadow: 0 0 8px rgba(255,0,0,0.5);
+}
+
+/* ================= Panel Buttons & Inputs ================= */
+#depositPanel button,
+#withdrawPanel button,
+#depositPanel input,
+#withdrawPanel input {
+    width: 100%;
+    margin-bottom: 6px;
+    margin-left: 5px;
+    padding: 10px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* ================= Panel Title ================= */
+.payment-title {
+    color: #ffffff;
+    font-size: 24px;
+    font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin-bottom: 0px;
+    padding-top: 20px;
+}
+
+/* ================= Submit Buttons ================= */
+#submitDeposit,
+#submitWithdraw {
+    background-color: green;
+    color: #00eaff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+#submitDeposit:hover,
+#submitWithdraw:hover {
+    background-color: darkgreen;
+    box-shadow: 0 0 8px rgba(0,255,0,0.5);
+}
+
+/* ================= Back Button ================= */
+.backBtn {
+    display: block;
+    margin-bottom: 10px;
+    text-align: left;
+    background: linear-gradient(135deg, #0f141a, #0a0f14);
+    color: #00eaff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
+
+    /* 🔥 FIX */
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+/* ================= Inputs ================= */
+#depositPanel input,
+#withdrawPanel input {
+    background-color: #2b2b2b;
+    color: #fff;
+    border: 1px solid #444;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    transition: 0.3s ease;
+}
+
+/* ================= Input Focus ================= */
+#depositPanel input:focus,
+#withdrawPanel input:focus {
+    border: 1px solid #00eaff;
+    box-shadow: 0 0 8px rgba(0,234,255,0.6);
+    outline: none;
+    background-color: #000;
+}
+
+/* 🛑🛑🛑🛑🛑 Wallet Bar*/
+/* 🛑🛑🛑🛑🛑 Wallet Bar*/
+/* 🛑🛑🛑🛑🛑 Wallet Bar*/
+/* ⤴️⤴️⤴️⤴️⤴️ Wallet Bar*/

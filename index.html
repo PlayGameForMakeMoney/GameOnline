@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin Wheel Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="payment.css">
+    
+    
+    <style>
+
+
+    
+    
+    
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <!-- Left menu -->
+  <div class="mobile-menu left-menu">
+    <button class="menu-btn">☰</button>
+    <div class="menu-content"></div>
+  </div>
+
+  <!-- Online stats centered -->
+  <div class="header-text" id="liveStats">
+    Online <span class="online-dot"></span> 0
+  </div>
+
+  <!-- Right menu -->
+  <div class="mobile-menu right-menu">
+    <button class="menu-btn">
+      <span style="display:inline-block; font-size:32px; line-height:1; vertical-align:middle;">⋮</span>
+    </button>
+    <div class="menu-content">
+      <button>Register</button>
+      <button>Log In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Wallet Display -->
+<div class="wallet-bar">
+  <div class="wallet-left">
+    <!-- Demo / Live Balance -->
+    <div class="demo-balance-dropdown">
+      <strong id="demoBalanceBtn">
+        Demo : $<span id="balanceAmount">10</span>
+        <span class="arrow">⌄</span>
+      </strong>
+      <div class="demo-balance-content">
+        <button onclick="selectOption('demo')">
+          Demo : $ <span id="demoBalanceSpan">10</span>
+        </button>
+        <button id="liveBalanceBtn" onclick="selectOption('live')">
+          Live : $ <span id="liveBalanceSpan">0</span>
+        </button>
+        <button id="convertDemoBtn" onclick="selectOption('convert')">
+          Convert Demo to Live
+        </button>
+      </div>
+    </div>
+    <button id="addFunds">+$10</button>
+  </div>
+
+    
+    
+    
+    
+       <!-- Single Wallet Right -->
+  <div class="wallet-right">
+    
+      <!-- Withdraw Wrapper -->
+    <div class="withdraw-wrapper">
+      <button id="withdrawBtn" data-panel="withdrawPanel">Withdraw</button>
+
+      <!-- Withdraw Panel -->
+      <div id="withdrawPanel" class="hidden panel">
+        <h4 class="payment-title">Select a payment option</h4>
+        <button class="methodBtn" data-method="bkash">bKash</button>
+        <button class="methodBtn" data-method="nagad">Nagad</button>
+        <button class="methodBtn" data-method="rocket">Rocket</button>
+        <button class="methodBtn" data-method="binance">Binance (USDT)</button>        
+          
+        <!-- Withdraw Form -->
+        <div id="withdrawForm" class="hidden">
+
+          <!-- Dynamic Withdraw Fields -->
+          <div id="withdrawDynamicFields"></div>
+
+          <input type="number" id="withdrawAmount" placeholder="Enter amount">
+          <input type="text" id="withdrawTransactionId" placeholder="Transaction ID / TXN Hash">
+          <button id="submitWithdraw">Submit Withdraw</button>
+          <button id="cancelWithdraw" data-close="withdrawPanel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+      
+      
+      
+    <!-- Deposit Wrapper -->
+    <div class="deposit-wrapper">
+      <button id="depositBtn" data-panel="depositPanel">Deposit</button>
+
+      <!-- Deposit Panel -->
+      <div id="depositPanel" class="hidden panel">
+        <h4 class="payment-title">Select a payment option</h4>
+        <button class="methodBtn" data-method="bkash">bKash</button>
+        <button class="methodBtn" data-method="nagad">Nagad</button>
+        <button class="methodBtn" data-method="rocket">Rocket</button>
+        <button class="methodBtn" data-method="binance">Binance (USDT)</button>
+       
+          
+        <!-- Deposit Form -->
+        <div id="depositForm" class="hidden">
+
+          <!-- Dynamic Deposit Fields -->
+          <div id="depositDynamicFields"></div>
+
+          <input type="number" id="depositAmount" placeholder="Enter amount">
+          <input type="text" id="transactionId" placeholder="Transaction ID / TXN Hash">
+          <button id="submitDeposit">Submit Deposit</button>
+          <button id="cancelDeposit" data-close="depositPanel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+ 
+      
+    
+<!-- User Transaction History -->
+<div id="transactionHistory"></div>
+
+<!-- Spin Wheel -->
+<canvas id="wheelCanvas" width="400" height="400"></canvas>
+<div id="result"></div>
+<button id="spinBtn">Spin</button>
+  
+<!-- Notification -->
+<div id="notification">Notification</div>
+    
+      
+  
+  
+<div class="footer-bar">
+  <button id="settingsBtn">⚙️</button>
+  <button id="helpBtn">❔</button>
+  <button id="dashboardBtn">🌐</button>
+  <button id="gameBtn">🎮</button>
+  <button id="notifBtn">🔔</button> 
+  <button id="muteBtn" aria-label="Mute / Unmute">🔊</button>
+  <button id="profileBtn" onclick="window.location.href='profile.html'">👤</button>   
+    
+</div>
+
+  
+   
+    
+  
+
+  <script>
+    
+   
+    // ----------------- Elements & Variables -----------------
+     const n = document.getElementById('notification'),
+      demoBtn = document.getElementById('demoBalanceBtn'),
+      demoDropdown = demoBtn.parentElement,
+      balanceSpan = document.getElementById('balanceAmount'),
+      depositBtn = document.getElementById('depositBtn'),
+      spinBtn = document.getElementById('spinBtn'),
+      addFundsBtn = document.getElementById('addFunds'),
+      canvas = document.getElementById('wheelCanvas'),
+      ctx = canvas.getContext('2d'),
+      numSegments = 16,
+      
+    
+      prizes = [
+          "$500","$+0","$50","$1","$700","$5","$25","$50",
+          "$400","$-0","$70","$3","$900","$2","$40","$4"
+      ],
+    
+    
+      centerX = canvas.width / 2,
+      centerY = canvas.height / 2,
+      radius = 180;
+
+let demoBalance = parseInt(balanceSpan.textContent),
+    liveBalance = 0,
+    userLoggedIn = false,
+    pointerAngle = 0,
+    spinSpeedPointer = 0,
+    pointerSpinning = false,
+    isHoldingSpin = false,
+    spinLocked = false,
+    highlightSegment = -1; // 🔹 হাইলাইটed প্রাইজ সেগমেন্ট
+    let currentBalanceType = "demo";
+
+    // ================= SAVE BALANCE TO SERVER =================
+// 🔹 এখানে ফাংশন বসবে
+function loadBalance(){
+
+fetch("http://localhost:3000/getBalance")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+// demo balance
+if(data.demo !== undefined){
+
+demoBalance = data.demo < 10 ? 10 : data.demo;
+
+}
+
+// live balance
+if(data.live !== undefined){
+
+liveBalance = data.live;
+
+}
+
+// dropdown update
+refreshDropdownBalances();
+
+// current balance UI update
+updateBalanceUI(currentBalanceType);
+
+// add funds button refresh
+refreshAddFundsBtn();
+
+});
+
+}
+
+
+// ================= SAVE BALANCE =================
+function saveBalance(){
+
+fetch("http://localhost:3000/updateBalance",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+demo:demoBalance,
+live:liveBalance
+
+})
+
+})
+
+.then(res=>res.text())
+.then(data=>{
+console.log("Balance saved:",data);
+})
+
+.catch(err=>{
+console.error("Save error:",err);
+});
+
+}
+    
+    
+// ======================
+// Safe Sound Wrappers
+// ======================
+const safePlaySpinEndSound = i => { if (typeof playSpinEndSound === 'function') playSpinEndSound(i); };
+const safePlayWarningSound = () => { if (typeof playWarningSound === 'function') playWarningSound(); };
+const safePlayGameSuccessSound = () => { if (typeof playGameSuccessSound === 'function') playGameSuccessSound(); };
+const safePlayIncorrectSound = () => { if (typeof playIncorrectSound === 'function') playIncorrectSound(); };
+
+// ----------------- Notification -----------------
+const showNotification = (message, duration = 2000, type = "error") => {
+    const formattedMessage = message.replace(/\+\$10/g, '<span style="color:#FFFF00">+$10</span>');
+    n.innerHTML = formattedMessage;
+
+    if (type === "success") safePlayGameSuccessSound();
+    else safePlayIncorrectSound();
+
+    n.classList.remove("success", "error");
+    n.classList.add(type);
+
+    n.style.display = "block";
+    requestAnimationFrame(() => n.style.opacity = "1");
+
+    if (type === "error" && message.includes("Balance")) {
+        addFundsBtn.classList.add('add-funds-highlight');
+        setTimeout(() => addFundsBtn.classList.remove('add-funds-highlight'), duration);
+    }
+
+    clearTimeout(n.timeoutId);
+    n.timeoutId = setTimeout(() => {
+        n.style.opacity = "0";
+        setTimeout(() => n.style.display = "none", 300);
+    }, duration);
+};
+
+// ----------------- Helpers -----------------
+const isDemoSelected = () => currentBalanceType === "demo";
+
+ // 🔹 ব্যালেন্স UI আপডেট, অতিরিক্ত .00 সরানোর জন্য
+const formatBalance = v => {
+    const rounded = Math.round(v * 100) / 100;
+    return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(2);
+};
+
+// 🔹 UI update ফাংশন
+const updateBalanceUI = (type) => {
+    demoBtn.childNodes[0].textContent = type === 'demo' ? 'Demo : $ ' : 'Live : $ ';
+    demoBtn.querySelector('span').textContent = type === 'demo' ? formatBalance(demoBalance) : formatBalance(liveBalance);
+    balanceSpan.textContent = type === 'demo' ? formatBalance(demoBalance) : formatBalance(liveBalance);
+
+    if (type === 'live' && liveBalance <= 0) {
+        showNotification("Your live balance is $0. Please deposit!");
+    }
+};
+
+const updateDropdownButtons = s => demoDropdown.querySelectorAll('.demo-balance-content button').forEach(b => {
+    let o = b.getAttribute('onclick').match(/'(\w+)'/)[1];
+    b.style.display = o === s ? "none" : "flex";
+    let sp = b.querySelector('span');
+    if (sp) sp.textContent = o === 'demo' ? demoBalance : liveBalance;
+});
+
+function refreshDropdownBalances() {
+    const demoSpan = document.getElementById('demoBalanceSpan');
+    const liveSpan = document.getElementById('liveBalanceSpan');
+    if (demoSpan) demoSpan.textContent = demoBalance;
+    if (liveSpan) liveSpan.textContent = liveBalance;
+}
+
+const refreshAddFundsBtn = () => addFundsBtn.style.visibility = !pointerSpinning && isDemoSelected() && demoBalance < 10 ? "visible" : "hidden";
+
+
+    
+    
+    
+// --সিলেক্ট আপশন-------- Balances & Conversion -----------------
+const formatDemo = v => Math.round(v * 1000) / 1000;
+const formatLive = v => Math.round(v * 100) / 100;
+
+const selectOption = o => {
+    if (o === 'convert') {
+        
+        if (demoBalance >= 10000) {
+            demoBalance = formatDemo(demoBalance);
+            let demoToConvert = demoBalance;
+            let d = demoToConvert / 1000;
+
+            // 🔹 দুই দশমিক পর্যন্ত ফরম্যাট, trailing 00 সরানো
+            liveBalance = Math.round((liveBalance + d) * 100) / 100;
+
+            demoBalance = 0; 
+            saveBalance();
+
+            // 🔹 এক লাইনের নোটিফিকেশন টেক্সট
+            const demoText = demoToConvert % 1 === 0 ? demoToConvert : demoToConvert.toFixed(2).replace(/\.00$/,'');
+            const liveText = liveBalance % 1 === 0 ? liveBalance : liveBalance.toFixed(2).replace(/\.00$/,'');
+            showNotification(`Demo: $${demoText} = Live: $${liveText} Converted Successfully!`, 2500, "success");
+
+            o = 'live';
+            refreshDropdownBalances();
+        } else {
+            return showNotification("Minimum $10 (10000 demo) required to convert!");
+        }
+    }
+
+    updateBalanceUI(o);
+    currentBalanceType = o;
+    updateDropdownButtons(o);
+    demoDropdown.classList.remove('active');
+};
+
+const initializeDropdown = () => updateDropdownButtons(isDemoSelected() ? 'demo' : 'live');
+
+    
+    
+    
+ // ----------------- Wheel Drawing with Highlight -----------------
+const drawWheel = () => {
+    let blink = Math.floor(Date.now() / 200) % 10;
+    const sa = 2 * Math.PI / numSegments;
+    for (let i = 0; i < numSegments; i++) {
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, i * sa, (i + 1) * sa);
+
+        if (i === highlightSegment) {
+            const loss = [1,9].includes(i);
+            let c = loss ? '255,60,60' : '0,255,255';
+            if (loss && blink === 0) c = '0,0,0';
+
+            const g = ctx.createRadialGradient(centerX, centerY, radius * 0.2, centerX, centerY, radius);
+            g.addColorStop(0, `rgba(${c},0.35)`);
+            g.addColorStop(0.7, `rgba(${c},0.15)`);
+            g.addColorStop(1, `rgba(${c},0.05)`);
+            ctx.fillStyle = g;
+            ctx.fill();
+        } else {
+            let g = ctx.createRadialGradient(centerX, centerY, radius * 0.2, centerX, centerY, radius);
+            g.addColorStop(0, i % 2 === 0 ? '#1b2735' : '#1f2f3f');
+            g.addColorStop(1, i % 2 === 0 ? '#0a0f14' : '#0c1218');
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(i * sa + sa / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#00eaff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText(prizes[i], radius - 15, 5);
+        ctx.restore();
+    }
+};
+
+// ----------------- Pointer & Lights -----------------
+const lights = [];
+const lightCount = 20;
+for (let i = 0; i < lightCount; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = Math.random() * 12;
+    lights.push({
+        angle: angle,
+        radius: radius,
+        size: Math.random() * 2 + 0.5,
+        color: ['#ff4d4d','#4d4dff','#b84dff','#4dffff'][Math.floor(Math.random()*4)],
+        speed: Math.random() * 0.01 + 0.002
+    });
+}
+
+const drawPointer = () => {
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(pointerAngle);
+    ctx.translate(0, -radius);
+
+    ctx.fillStyle = 'rgba(0, 191, 255, 0.5)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    lights.forEach(l => {
+        l.angle += l.speed;
+        const x = Math.cos(l.angle) * l.radius;
+        const y = Math.sin(l.angle) * l.radius;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, l.size);
+        grad.addColorStop(0, l.color);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, l.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    const outerHalo = ctx.createRadialGradient(0, 0, 12, 0, 0, 15);
+    outerHalo.addColorStop(0, 'rgba(0,0,0,0)');
+    outerHalo.addColorStop(1, 'rgba(0,0,0,0.2)');
+    ctx.fillStyle = outerHalo;
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    const shineGradient = ctx.createRadialGradient(-5, -5, 0, -5, -5, 8);
+    shineGradient.addColorStop(0, 'rgba(255,255,255,0.3)');
+    shineGradient.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = shineGradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+};
+
+// ----------------- Spin Prize Logic -----------------
+const determinePrize = () => {
+    const sa = 2 * Math.PI / numSegments;
+    let angle = pointerAngle % (2 * Math.PI);
+    if (angle < 0) angle += 2 * Math.PI;
+    angle -= Math.PI / 2;
+    if (angle < 0) angle += 2 * Math.PI;
+
+    const index = Math.floor(angle / sa);
+    highlightSegment = index;
+
+    const prize = prizes[index];
+    const resultEl = document.getElementById('result');
+    let balanceAfterSpin;
+    let lostAmount = 0;
+    const lossSegments = [1, 9];
+
+    if (isDemoSelected()) {
+        let sel = demoBalance;
+        if (lossSegments.includes(index) || prize === "$+0" || prize === "$-0") {
+            lostAmount = (prize === "$-0") ? sel * 2/3 : sel / 2;
+            sel -= lostAmount;
+            showNotification(`You lost $${lostAmount.toFixed(2)} demo balance!`);
+            resultEl.textContent = `You lost $${lostAmount.toFixed(2)}`;
+            resultEl.style.color = "red";
+            resultEl.style.fontWeight = "bold";
+        } else {
+            const amount = parseFloat(prize.replace("$",""));
+            if (!isNaN(amount)) sel += amount;
+            resultEl.textContent = `You won: ${prize}`;
+            resultEl.style.color = "#00ff00";
+            resultEl.style.fontWeight = "bold";
+        }
+        demoBalance = Math.round(sel * 100) / 100;
+        balanceSpan.textContent = formatBalance(demoBalance);
+        balanceAfterSpin = demoBalance;
+
+        if (demoBalance < 10) {
+            safePlayWarningSound();
+            resultEl.textContent = "Insufficient demo balance";
+            resultEl.style.color = "red";
+            resultEl.style.fontWeight = "bold";
+        }
+
+    } else {
+        let sel = liveBalance;
+        if (lossSegments.includes(index) || prize === "$+0" || prize === "$-0") {
+            lostAmount = (prize === "$-0") ? sel * 2/3 : sel / 2;
+            sel -= lostAmount;
+            showNotification(`You lost $${lostAmount.toFixed(2)} live balance!`);
+            resultEl.textContent = `You lost $${lostAmount.toFixed(2)}`;
+            resultEl.style.color = "red";
+            resultEl.style.fontWeight = "bold";
+        } else {
+            const amount = parseFloat(prize.replace("$",""));
+            if (!isNaN(amount)) sel += amount;
+            resultEl.textContent = `You won: ${prize}`;
+            resultEl.style.color = "#00ff00";
+            resultEl.style.fontWeight = "bold";
+        }
+        liveBalance = Math.round(sel * 100) / 100;
+        balanceSpan.textContent = formatBalance(liveBalance);
+        balanceAfterSpin = liveBalance;
+
+        if (liveBalance < 10) {
+            safePlayWarningSound();
+            resultEl.textContent = "Insufficient live balance";
+            resultEl.style.color = "red";
+            resultEl.style.fontWeight = "bold";
+        }
+    }
+
+    refreshAddFundsBtn();
+    refreshDropdownBalances();
+        
+    safePlaySpinEndSound(index);
+    saveBalance(); // 🔹 spin cost save
+    setTimeout(() => { highlightSegment = -1; }, 2000);
+    
+};
+
+    
+    
+    
+    
+    
+// ----------------- Animation -----------------
+const animate = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawWheel();
+    drawPointer();
+    if (pointerSpinning) {
+        pointerAngle += isHoldingSpin ? 0.25 : spinSpeedPointer;
+        if (!isHoldingSpin) {
+            spinSpeedPointer *= 0.97;
+            if (spinSpeedPointer < 0.002) {
+                pointerSpinning = false;
+                spinLocked = false;
+                spinBtn.disabled = false;
+                determinePrize();
+            }
+        }
+    }
+    requestAnimationFrame(animate);
+};
+
+    
+    
+    
+    
+// ----------------- Spin Ball -----------------
+
+    const startSpin = () => {
+        refreshAddFundsBtn();
+    if (spinLocked) return;
+    highlightSegment = -1;
+
+    if (isDemoSelected() && demoBalance < 10) {
+        showNotification("Insufficient Demo Balance! Click +$10 button");
+        const r = document.getElementById('result');
+        r.textContent = "Insufficient demo balance";
+        r.style.color = "red";
+        r.style.fontWeight = "bold";
+        return;
+    }
+    if (!isDemoSelected() && liveBalance < 10) {
+        showNotification("Your Live Balance must be at least $10 to spin!");
+        const r = document.getElementById('result');
+        r.textContent = "Insufficient live balance";
+        r.style.color = "red";
+        r.style.fontWeight = "bold";
+        return;
+    }
+
+    if (isDemoSelected()) demoBalance -= 10, balanceSpan.textContent = formatBalance(demoBalance);
+    else liveBalance -= 10, updateBalanceUI('live');
+
+    saveBalance(); // 🔹 spin শুরুতেই balance save
+          
+    spinLocked = true;
+    spinBtn.disabled = true;
+    pointerSpinning = true;
+    isHoldingSpin = true;
+    spinSpeedPointer = 0.25;
+};
+
+    
+// ----------------- Add Funds -----------------
+const addFunds = () => {
+    if (demoBalance < 10) {
+        demoBalance += 10;
+        balanceSpan.textContent = formatBalance(demoBalance);
+        refreshAddFundsBtn();
+        refreshDropdownBalances();
+        saveBalance();
+    }
+};
+
+// ----------------- Initialization -----------------
+initializeDropdown();
+animate();
+loadBalance();
+refreshAddFundsBtn();
+    
+    
+
+    
+    
+    
+demoBtn.addEventListener('dblclick', () => selectOption('demo'));
+demoBtn.addEventListener('click', e => { demoDropdown.classList.toggle('active'); e.stopPropagation(); });
+document.addEventListener('click', () => demoDropdown.classList.remove('active'));
+
+spinBtn.style.userSelect = 'none';
+spinBtn.addEventListener('contextmenu', e => e.preventDefault());
+
+const safeStartSpin = e => { if (!spinBtn.disabled) startSpin(e); };
+['mousedown','touchstart'].forEach(e => {
+    spinBtn.addEventListener(e, safeStartSpin, { passive: false });
+    spinBtn.addEventListener(e, ev => ev.preventDefault(), { passive: false });
+});
+['mouseup','mouseleave','touchend'].forEach(e => { spinBtn.addEventListener(e, () => { isHoldingSpin=false; }); });
+
+addFundsBtn.addEventListener('click', addFunds);
+refreshAddFundsBtn();
+
+new MutationObserver(() => { if (!pointerSpinning) refreshAddFundsBtn(); })
+    .observe(demoBtn, { childList: true, subtree: true, characterData: true });
+      
+    
+    
+    
+    
+    
+</script>   
+    
+<script src="spin-trail.js"></script>    
+
+<script src="fakeUser.js"></script>
+<!-- Withdraw-Deposit JS -->
+<script src="payment.js" defer></script>
+<script src="sound.js"></script>
+    
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  
+       
+</body>
+</html>    

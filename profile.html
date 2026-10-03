@@ -1,0 +1,417 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Account</title><link rel="stylesheet" href="profile.css">
+</head><body><div class="profile-header"><button class="home-btn" id="homeBtn">
+    ← Home
+</button>
+
+
+    
+    <div class="header-title">
+
+    <button
+        class="balance-btn"
+        id="demoBalanceBtn">
+        Demo Balance
+    </button>
+
+    <button
+        class="balance-btn"
+        id="liveBalanceBtn">
+        Live Balance
+    </button>
+
+</div>
+    
+    
+    
+    
+
+<div style="width:60px;"></div>
+
+</div><div class="profile-container"><!-- TOP USER CARD --><div class="user-card"><div class="avatar">
+    👤
+</div>
+
+<h2 class="user-name" id="topUserName">
+    Account
+</h2>
+
+<div class="user-id" id="topUserId">
+    Not joined
+</div>
+
+<div
+    class="account-status"
+    id="topStatus"
+    style="cursor:pointer;">
+    Guest
+</div>
+
+</div><div id="message" class="message"></div><!-- LOGIN / REGISTRATION --><div id="accountSection" class="panel"><!-- LOGIN --><div id="loginView"><h2 class="panel-title">
+    Log In
+</h2>
+
+<p class="panel-subtitle">
+    Log in to your account
+</p>
+
+<div class="form-group">
+
+    <label>
+        Email
+    </label>
+
+    <input
+        type="email"
+        id="loginEmail"
+        placeholder="Enter your email">
+
+</div>
+
+
+<div class="form-group">
+
+    <label>
+        Password
+    </label>
+
+    <input
+        type="password"
+        id="loginPassword"
+        placeholder="Enter your password">
+
+</div>
+
+
+<button
+    class="primary-btn"
+    id="loginSubmit">
+    Log In
+</button>
+
+
+<button
+    class="secondary-btn"
+    id="showRegister">
+    Don't have an account? Create Account
+</button>
+
+</div><!-- REGISTRATION --><div id="registerView" class="hidden"><h2 class="panel-title">
+    Create Account
+</h2>
+
+<p class="panel-subtitle">
+    Create your new profile
+</p>
+
+
+<div class="form-group">
+
+    <label>
+        Full Name
+    </label>
+
+    <input
+        type="text"
+        id="registerName"
+        placeholder="Enter your name">
+
+</div>
+
+
+<div class="form-group">
+
+    <label>
+        Email
+    </label>
+
+    <input
+        type="email"
+        id="registerEmail"
+        placeholder="Enter your email">
+
+</div>
+
+
+<div class="form-group">
+
+    <label>
+        Password
+    </label>
+
+    <input
+        type="password"
+        id="registerPassword"
+        placeholder="Minimum 6 characters">
+
+</div>
+
+
+<div class="form-group">
+
+    <label>
+        Confirm Password
+    </label>
+
+    <input
+        type="password"
+        id="registerConfirmPassword"
+        placeholder="Confirm your password">
+
+</div>
+
+
+<label class="check-row">
+
+    <input
+        type="checkbox"
+        id="registerRules">
+
+    <span>
+        I agree to the Rules & Conditions
+    </span>
+
+</label>
+
+
+<button
+    class="primary-btn"
+    id="registerSubmit">
+    Create Account
+</button>
+
+
+<button
+    class="secondary-btn"
+    id="backToLogin">
+    Already have an account? Log In
+</button>
+
+</div><!-- EMAIL OTP VERIFICATION --><div id="otpView" class="hidden"><h2 class="panel-title">
+    Verify Email
+</h2>
+
+<p class="panel-subtitle">
+    Enter the OTP code sent to your email
+</p>
+
+
+<div class="form-group">
+
+    <label>
+        OTP Code
+    </label>
+
+    <input
+        type="text"
+        id="emailOtp"
+        maxlength="6"
+        inputmode="numeric"
+        placeholder="Enter 6-digit OTP">
+
+</div>
+
+
+<button
+    class="primary-btn"
+    id="verifyOtpBtn">
+    Verify Email
+</button>
+
+
+<button
+    class="secondary-btn"
+    id="resendOtpBtn">
+    Resend OTP
+</button>
+
+
+<button
+    class="secondary-btn"
+    id="cancelOtpBtn">
+    Cancel
+</button>
+
+</div></div><!-- GUEST --><div
+    id="guestSection"
+    class="panel guest-section"><div class="guest-box">
+
+    <div class="guest-icon">
+        👤
+    </div>
+
+    <h2 class="guest-title">
+        Join as a Guest
+    </h2>
+
+    <p class="guest-text">
+        Continue without creating an account.
+    </p>
+
+
+    <label class="check-row guest-check">
+
+        <input
+            type="checkbox"
+            id="guestRules">
+
+        <span>
+            I agree to the Rules & Conditions
+        </span>
+
+    </label>
+
+
+    <button
+        class="primary-btn"
+        id="guestJoinBtn">
+        Join as a Guest
+    </button>
+
+</div>
+
+</div><!-- PROFILE --><div
+    id="profileSection"
+    class="panel hidden"><h2 class="panel-title">
+    Profile
+</h2>
+
+<p class="panel-subtitle">
+    Your account information
+</p>
+
+
+<!-- USER NAME -->
+
+<div class="info-row">
+
+    <div class="info-label">
+        User Name
+    </div>
+
+    <div
+        class="info-value"
+        id="profileName">
+        —
+    </div>
+
+</div>
+
+
+<!-- USER ID -->
+
+<div class="info-row">
+
+    <div class="info-label">
+        User ID
+    </div>
+
+    <div
+        class="info-value"
+        id="profileId">
+        —
+    </div>
+
+</div>
+
+
+<!-- EMAIL -->
+
+<div class="info-row">
+
+    <div class="info-label">
+        Email
+    </div>
+
+    <div class="info-value">
+
+        <span id="profileEmail">
+            —
+        </span>
+
+        <button
+            class="profile-action-btn"
+            id="changeEmailBtn">
+            Change
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- PASSWORD -->
+
+<div class="info-row">
+
+    <div class="info-label">
+        Password
+    </div>
+
+    <div class="info-value">
+
+        <span>
+            ••••••••
+        </span>
+
+        <button
+            class="profile-action-btn"
+            id="changePasswordBtn">
+            Change
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- FORGOT PASSWORD -->
+
+<div class="info-row">
+
+    <div class="info-label">
+        Password Recovery
+    </div>
+
+    <div class="info-value">
+
+        <button
+            class="profile-action-btn"
+            id="forgotPasswordBtn">
+            Forgot Password
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- JOINED -->
+
+<div class="info-row">
+
+    <div class="info-label">
+        Joined
+    </div>
+
+    <div
+        class="info-value"
+        id="profileJoined">
+        —
+    </div>
+
+</div>
+
+</div><!-- LOG OUT --><div
+    id="logoutArea"
+    class="logout-area hidden"><button
+    class="logout-button"
+    id="logoutBtn">
+
+    🚪 Log Out
+
+</button>
+
+</div></div><script src="profile.js"></script></body>
+</html>
